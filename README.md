@@ -1,5 +1,6 @@
 # Guide to setting the plugin
 Plugin is ready for integration with jetEngine forms.
+
 A. Setting for tokens' generation
   1. Create a form with Inputs:
       1. Token length (number of chars)   - name of the input : "tokenLength"
