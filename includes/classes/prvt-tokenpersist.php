@@ -167,9 +167,12 @@ class PrVt_TokenPersist
         $post_data['post_name']  = $token;
         $post_data['meta_input'] = array(
           'pr-projekt'  => $this->parent_id,
-          'platnost_od' => date( 'Y-m-d H:i:s', $issue_time),
-          'platnost_do' => date( 'Y-m-d H:i:s', $expiration_time),
-          'zbyva_hlasu' => $this->votes_count,
+          'token'       => $token,
+          'platnost_od' => strval( $issue_time),
+          'platnost_do' => strval( $expiration_time),
+          // 'platnost_od' => date( 'Y-m-d H:i:s', $issue_time),
+          // 'platnost_do' => date( 'Y-m-d H:i:s', $expiration_time),
+          'zbyva_hlasu' => strval( $this->votes_count),
         );
 
         $post_id = wp_insert_post( $post_data, true);

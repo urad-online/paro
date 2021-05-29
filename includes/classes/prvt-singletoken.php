@@ -56,7 +56,7 @@ class PrVt_SingleToken
     {
       $query_arg = array(
               'post_type' => PRVT_POST_TYPE,
-              'post_title' => $this->token_value,
+              'name' => $this->token_value,
               'posts_per_page' => -1,
             );
       $post_list = new WP_Query( $query_arg );
@@ -80,10 +80,11 @@ class PrVt_SingleToken
 
     protected function is_active()
     {
-        $curr_time      =  date( 'Y-m-d H:i:s', current_time( 'timestamp', 0 ));
-        $platnost_od    = $this->token_post['meta_data']['platnost_od'][0];
-        $platnost_do    = $this->token_post['meta_data']['platnost_do'][0];
-        $hlasu          = $this->token_post['meta_data']['zbyva_hlasu'][0];
+        // $curr_time      =  date( 'Y-m-d H:i:s', current_time( 'timestamp', 0 ));
+        $curr_time      =  current_time( 'timestamp', 0 );
+        $platnost_od    = intval($this->token_post['meta_data']['platnost_od'][0]);
+        $platnost_do    = intval( $this->token_post['meta_data']['platnost_do'][0]);
+        $hlasu          = intval($this->token_post['meta_data']['zbyva_hlasu'][0]);
 
         $result= false;
         if (($hlasu >0) && ($platnost_od <= $curr_time) && ($platnost_do > $curr_time)) {
