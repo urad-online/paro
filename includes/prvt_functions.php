@@ -171,3 +171,18 @@ function prvt_saveVotes($result = "", $data = "", $form_id = "", $spec_notif = "
     return false;
   }
 }
+
+function PrVt_TokenDelete($result = "", $data = "", $form_id = "", $spec_notif = "" )
+{
+  $token_to_delete = new PrVt_DeleteTokens( $data);
+  $result = $token_to_delete->delete_tokens();
+  if ($result) {
+    return true;
+  } else {
+    $result = $token_to_delete->get_result();
+    // $spec_notif->set_specific_status( $result['message']);
+    return false;
+  }
+}
+
+// PrVt_TokenDelete( true, array( 'projekt' => 543,), 545, "" );

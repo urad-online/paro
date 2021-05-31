@@ -17,7 +17,8 @@ define( 'PRVT_POST_TYPE',  "pr-respondenti");
 // define( 'PRVT_VOTING_PAGE', "pr-projec-votes");
 // define( 'PRVT_VOTING_PAGE', "registrace-form");
 define( 'PRVT_VOTING_PAGE', "hlasovani-paro");
-define( 'PRVT_VOTE_TABLE_NAME', 'paro_votes');
+define( 'PRVT_VOTE_TABLE_NAME', 'jet_cct_pr_hlasy');
+// define( 'PRVT_VOTE_TABLE_NAME', 'paro_votes');
 define( 'INPUTS_FORM_GENERATE', array(
   'token_length' => 'tokenLength',
   'token_count'  => 'tokenCount',
@@ -35,6 +36,11 @@ define( 'INPUTS_FORM_VOTE', array(
   'votes_minus'  => 'minusa',
   'voting_start' => 'hlasovani_konec',
   'voting_end'   => 'hlasovani_zacatek',
+));
+define( 'INPUTS_FORM_DELETE', array(
+  'token'        => 'token',
+  'project_id'   => 'projekt',
+  'token_status' => 'status',
 ));
 
 register_activation_hook( __FILE__, 'prvt_activation' );

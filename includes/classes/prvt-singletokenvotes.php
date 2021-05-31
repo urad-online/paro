@@ -1,16 +1,19 @@
 <?php
 /**
- * @package PARO hlas
- * @version 0.1.0
+ * Saves votes to the table.
+ *
+ * Check if the token is still valid and active. If so, saves all votes and markes
+ * token as used. Uses token validation from class PrVt_SingleToken.
+ *
+ * @package paro
+ * @since 0.1.0
  */
-/*
-* Class extends token's validity check by checking project_id and saves votes into database
-*/
 class PrVt_SingleTokenVotes extends PrVt_SingleToken
 {
     protected $project_id  = "";
     protected $votes_plus  = null;
     protected $votes_minus = null;
+    private $values_delimiter = ",";
 
     public function __construct( $params = null)
     {
@@ -32,13 +35,24 @@ class PrVt_SingleTokenVotes extends PrVt_SingleToken
         $this->project_id = $project_id;
       }
 
-      $this->votes_plus  =  explode ( "," , $this->getValueFromParams( INPUTS_FORM_VOTE['votes_plus']));
-      $this->votes_minus =  explode ( "," , $this->getValueFromParams( INPUTS_FORM_VOTE['votes_minus']));
+      // parses votes (proposal ids) from strings
+      $this->votes_plus  =  explode ( $this->values_delimiter , $this->getValueFromParams( INPUTS_FORM_VOTE['votes_plus']));
+      $this->votes_minus =  explode ( $this->values_delimiter , $this->getValueFromParams( INPUTS_FORM_VOTE['votes_minus']));
 
       $this->voting_start = $this->getValueFromParams( INPUTS_FORM_VOTE['voting_start']);
       $this->voting_end   = $this->getValueFromParams( INPUTS_FORM_VOTE['voting_end']);
     }
 
+    /**
+    * Checks token value.
+    *
+    * Checks if token exists and is active. Extends the validation by checking
+    * id submitted project_id equals to the project_id the token is assigned to.
+    *
+    * @since 0.1.0
+    *
+    * @return bool|mixed If token is active returns array otherwise false.
+    */
     public function checkToken( )
     {
 
@@ -55,6 +69,15 @@ class PrVt_SingleTokenVotes extends PrVt_SingleToken
 
     }
 
+    /**
+    * Saves votes.
+    *
+    * Calls method for token validation if this is successfull saves votes.
+    *
+    * @since 0.1.0
+    *
+    * @return bool
+    */
     public function save_votes()
     {
         $result = false;
@@ -68,23 +91,62 @@ class PrVt_SingleTokenVotes extends PrVt_SingleToken
         }
         return $result;
     }
+    /**
+    * Sets token as used.
+    *
+    * Sets remaining votes to zero and sets timestamps of voting start & end submitted from form.
+    *
+    * @since 0.1.0
+    *
+    * @return bool
+    */
     private function set_token_used()
     {
         update_post_meta($this->token_post['ID'], "zbyva_hlasu", 0);
         update_post_meta($this->token_post['ID'], "hlasovani_zacatek", $this->voting_start);
         update_post_meta($this->token_post['ID'], "hlasovani_konec",   $this->voting_end);
     }
+    /**
+    * Saves plus and minus votes.
+    *
+    * Saves separately plus and minus votes. Ignores empty values created by explode function.
+    *
+    * @since 0.1.0
+    *
+    */
     private function save_plus_minus_votes()
     {
+        $result = true;
         foreach ($this->votes_plus as $vote) {
-          $this->save_one_vote( $vote, 1,0);
+          if (! empty( $vote)) {
+            if (! $this->save_one_vote( $vote, 1,0) ) {
+              $result = false;
+            }
+          }
         }
         foreach ($this->votes_minus as $vote) {
-          $this->save_one_vote( $vote, 0,1);
+          if (! empty( $vote)) {
+            if (! $this->save_one_vote( $vote, 0,1)) {
+              $result = false;
+            };
+          }
         }
-        return true;
+        return $result;
     }
 
+    /**
+    * Inserts one vote into the database.
+    *
+    * Inserts a record into database and returns result.
+    *
+    * @since 0.1.0
+    *
+    * @param string $proposal_id ID of voted proposal.
+    * @param int $vote_plus Plus vote - values n/0.
+    * @param int $vote_minus Minus vote - values n/0.
+    *
+    * @return bool
+    */
     public function save_one_vote( $proposal_id, $vote_plus = 0, $vote_minus = 0)
     {
         $insert_time = date( 'Y-m-d H:i:s',current_time( 'timestamp', 0 ));

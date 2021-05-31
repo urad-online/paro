@@ -8,8 +8,8 @@
  * @subpackage prvt_load
  * @since 0.1.0
 */
-require_once PRVT_PATH_INC. '/prvt_functions.php';
 spl_autoload_register('prvt_autoloader', true);
+require_once PRVT_PATH_INC. '/prvt_functions.php';
 
 
 function prvt_autoloader( $class_name ) {
