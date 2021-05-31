@@ -172,7 +172,7 @@ function prvt_saveVotes($result = "", $data = "", $form_id = "", $spec_notif = "
   }
 }
 
-function PrVt_TokenDelete($result = "", $data = "", $form_id = "", $spec_notif = "" )
+function prvt_deleteToken($result = "", $data = "", $form_id = "", $spec_notif = "" )
 {
   $token_to_delete = new PrVt_DeleteTokens( $data);
   $result = $token_to_delete->delete_tokens();
@@ -180,7 +180,7 @@ function PrVt_TokenDelete($result = "", $data = "", $form_id = "", $spec_notif =
     return true;
   } else {
     $result = $token_to_delete->get_result();
-    // $spec_notif->set_specific_status( $result['message']);
+    $spec_notif->set_specific_status( $result['message']);
     return false;
   }
 }

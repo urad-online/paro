@@ -41,7 +41,8 @@ function prvt_autoloader( $class_name ) {
 function prvt_on_init()
 {
     add_filter('jet-engine-booking/filter/generateTokens', "prvt_generateTokens", 10, 4);
-    add_filter('jet-engine-booking/filter/getTokens', "prvt_getTokens", 10, 4);
-    add_filter('jet-engine-booking/filter/checkToken', "prvt_checkToken", 10, 4);
-    add_filter('jet-engine-booking/filter/saveVotes', "prvt_saveVotes", 10, 4);
+    add_filter('jet-engine-booking/filter/getTokens',   "prvt_getTokens", 10, 4);
+    add_filter('jet-engine-booking/filter/checkToken',  "prvt_checkToken", 10, 4);
+    add_filter('jet-engine-booking/filter/saveVotes',   "prvt_saveVotes", 10, 4);
+    add_filter('jet-engine-booking/filter/deleteToken', "prvt_deleteToken", 10, 4);
 }
