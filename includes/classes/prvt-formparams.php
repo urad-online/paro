@@ -4,25 +4,25 @@
  *
  *
  * @package paro
- * @since 0.1.0
+ * @since 0.2.0
  */
 class PrVt_FormParams
 {
     /**
     * Array with values from jetEngine form.
-    * @since 0.1.0
+    * @since 0.2.0
     * @var array $params
     */
     protected $params = array();
     /**
     * Error messages. Are set in costructor because of calling translation function.
-    * @since 0.1.0
+    * @since 0.2.0
     * @var array $messages
     */
     protected $messages = array();
     /**
     * Result.
-    * @since 0.1.0
+    * @since 0.2.0
     * @var array $messages
     */
     protected $result = array();
@@ -53,17 +53,34 @@ class PrVt_FormParams
     *
     * Reads values from array set in constructor. If expected value is not set, the default value is used.
     *
-    * @since 0.1.0
+    * @since 0.2.0
     */
     protected function set_params()
     {
       // to be overwritten
     }
+    /**
+    * Sets error message to the result.
+    *
+    * @since 0.2.0
+    */
     protected function set_result_error( $msg_type)
     {
         $this->result =  array(
           'result'  => 'error',
           'message' => $this->messages[ $msg_type],
+        );
+    }
+    /**
+    * Sets OK message to the result.
+    *
+    * @since 0.2.0
+    */
+    protected function set_result_ok( )
+    {
+        $this->result =  array(
+          'result'  => 'ok',
+          'message' => $this->messages[ 'ok'],
         );
     }
 
@@ -72,7 +89,7 @@ class PrVt_FormParams
     *
     * Check if the required values is set. If not return empty string.
     *
-    * @since 0.1.0
+    * @since 0.2.0
     *
     * @param string $param_name Name of the key in the array.
     *

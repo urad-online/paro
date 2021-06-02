@@ -35,8 +35,23 @@ C. Setting for votes' saving
   2. Use value "saveVotes" in the callback function definition in the form.
       see   add_filter('jet-engine-booking/filter/saveVotes', "prvt_saveVotes", 10, 4);
 
+D. Setting for votes' deleting
+  1. Create a form with Inputs:
+    1. a)
+      1. Token value  - name of the input : "token"
+    1. b)
+      1. Project ID  - name of the input : 'projekt'
+      2. Token status - name of the input : 'status', ( supported values are all|active|expired|used. Can be empty)
+      Name if inputs can be changes in const INPUTS_FORM_DELETE in header of paro.php file.
+  2. Use value "deleteToken" in the callback function definition in the form.
+      see   add_filter('jet-engine-booking/filter/deleteToken', "prvt_deleteToken", 10, 4);
+
 
 # ChangeLog
+## 0.2.0
+* Added deleting of tokens;
+* Name of DB table changed to wp_jet_cct_pr_hlasy. Removed table column "created_time";
+
 
 ## 0.1.0
 

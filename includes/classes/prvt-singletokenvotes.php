@@ -149,17 +149,15 @@ class PrVt_SingleTokenVotes extends PrVt_SingleToken
     */
     public function save_one_vote( $proposal_id, $vote_plus = 0, $vote_minus = 0)
     {
-        $insert_time = date( 'Y-m-d H:i:s',current_time( 'timestamp', 0 ));
 
         $sql_comm = $this->db->prepare( 'INSERT INTO '.$this->db->prefix . PRVT_VOTE_TABLE_NAME
-            . ' (project_id, proposal_id, token_id, vote_plus, vote_minus, created_time)
-            VALUES ( %d, %d, %d, %d, %d, %s)',
+            . ' (project_id, proposal_id, token_id, vote_plus, vote_minus)
+            VALUES ( %d, %d, %d, %d, %d)',
                 intval( $this->project_id ),
                 intval( $proposal_id ),
                 $this->token_post['ID'],
                 $vote_plus ,
-                $vote_minus,
-                $insert_time
+                $vote_minus
                 );
 
         $result = $this->db->query( $sql_comm );

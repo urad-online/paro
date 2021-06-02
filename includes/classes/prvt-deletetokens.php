@@ -11,17 +11,10 @@
 class PrVt_DeleteTokens extends PrVt_FormParams
 {
     protected $token_value   = "";
-    protected $parent_id    = 0;
     protected $token_status  = "all";
     protected $single_delete = false;
     private   $values_delimiter = ",";
 
-    /**
-    * Error messages. Are set in costructor because of calling translation function.
-    * @since 0.1.0
-    * @var array $messages
-    */
-    protected $messages = array();
     /**
     * Id of project the token is assigned to.Set from input parameters.
     * @since 0.1.0
@@ -36,11 +29,11 @@ class PrVt_DeleteTokens extends PrVt_FormParams
         $this->db = $wpdb;
     }
     /**
-     * Set class properties.
-     *
-     * @param array $params Array of input fields with values from form
-     * @since 0.1.0
-     */
+    * Set class properties.
+    *
+    * @param array $params Array of input fields with values from form
+    * @since 0.1.0
+    */
     protected function set_messages()
     {
         $this->messages = array(
@@ -62,7 +55,7 @@ class PrVt_DeleteTokens extends PrVt_FormParams
     {
       $project_id = intval($this->getValueFromParams( INPUTS_FORM_DELETE['project_id']));
       if (!empty($project_id) && ($project_id >0)) {
-        $this->parent_id = $project_id;
+        $this->project_id = $project_id;
       }
 
       $status = $this->getValueFromParams( INPUTS_FORM_DELETE['token_status']);
@@ -78,37 +71,66 @@ class PrVt_DeleteTokens extends PrVt_FormParams
 
     }
 
+    /**
+    * Main function for both single token deletion or deletion of tokens of a project.
+    *
+    * @since 0.2.0
+    *
+    * @return bool Result.
+    */
     public function delete_tokens()
     {
       if ($this->single_delete) {
-        $result = $this->delete_single_token();
-      } elseif ($this->parent_id > 0) {
-        $result = $this->delete_project_tokens();
+        $result = $this->delete_tokens_by_title();
+      } elseif ($this->project_id > 0) {
+        $result = $this->delete_tokens_by_project();
       } else {
         $this->set_result_error('empty_params');
         $result = false;
       }
       return $result;
     }
+
     /**
-    * Sets post_type attributes into class property.
+    * Delete token(s) defined by they value. Values are taken from an array.
     *
-    * @since 0.1.0
+    * @since 0.2.0
+    *
+    * @return bool Result.
     */
-    private function delete_single_token()
+    private function delete_tokens_by_title()
     {
       $result = true;
       foreach ($this->token_value as $token) {
         if (! empty( $token)) {
           $post_id = $this->get_token_post( $token);
           if ( $post_id && ! is_bool( $post_id)) {
-            $this->delete_single_token_votes( $post_id);
-            if (! $this->delete_single_token_post( $post_id)) {
+            if (! $this->delete_token_by_postid( $post_id)) {
               $result = false;
-            };
+            }
           }
         }
       }
+      return $result;
+    }
+
+    /**
+    * Delete a token including its votes.
+    *
+    * @since 0.2.0
+    *
+    * @param string $post_id ID of the token post.
+    *
+    * @return bool Result.
+    */
+    private function delete_token_by_postid( $post_id)
+    {
+      $result = true;
+      $this->delete_single_token_votes( $post_id);
+      if (! $this->delete_single_token_post( $post_id)) {
+        $result = false;
+      }
+      return $result;
     }
 
     /**
@@ -116,7 +138,7 @@ class PrVt_DeleteTokens extends PrVt_FormParams
     *
     * Looks for posts by token value and returns the wp post.
     *
-    * @since 0.1.0
+    * @since 0.2.0
     *
     * @param string $token Token value.
     * @return int|bool Returns post or false.
@@ -152,7 +174,7 @@ class PrVt_DeleteTokens extends PrVt_FormParams
     *
     * Validates mandatory attributes and inserts new post.
     *
-    * @since 0.1.0
+    * @since 0.2.0
     *
     * @return string  Error message.
     */
@@ -161,6 +183,15 @@ class PrVt_DeleteTokens extends PrVt_FormParams
         return $this->result['message'];
     }
 
+    /**
+    * Delete all votes of a single token.
+    *
+    * @since 0.2.0
+    *
+    * @param string $post_id ID of the token post.
+    *
+    * @return bool Result.
+    */
     private function delete_single_token_votes( $post_id)
     {
       $sql_comm = $this->db->prepare( 'DELETE FROM '.$this->db->prefix . PRVT_VOTE_TABLE_NAME
@@ -184,118 +215,136 @@ class PrVt_DeleteTokens extends PrVt_FormParams
       }
     }
 
+    /**
+    * Delete single token post record by post_id.
+    *
+    * @since 0.2.0
+    *
+    * @param string $post_id.
+    *
+    * @return bool Result.
+    */
     private function delete_single_token_post( $post_id)
     {
-      $result = wp_delete_post( $post_id, false );
+      $result = wp_delete_post( $post_id, true );
       return true;
     }
-    private function delete_project_tokens()
-    {
-      $this->result = array(
-        'result'  => 'error',
-        'message' => "Dosud není implementováno",
-      );
-      return false;
-    }
+
     /**
-    * Reads tokens from DB.
+    * Mass delete of token for specific project.
     *
-    * Reads data for parameters project, status and timestamp of token validity.
-    * The date from is not implemented yet.
-    * @since 0.1.0
+    * @since 0.2.0
     *
-    * @param int $parent_id
-    * @param string $status
-    * @param datetime $from_date
-    * @return array  List of tokens - post ID + token value.
+    * @return bool Result.
     */
-    public function get_project_tokens( $parent_id = 0, $status = "all", $from_date = "" )
+    public function delete_tokens_by_project( )
     {
-        $status = strtolower( $status);
+      $query_arg = array(
+              'post_type'   => PRVT_POST_TYPE,
+              'post_parent' => $this->project_id,
+              'posts_per_page' => -1,
+            );
+      if ( $this->token_status !== "all" ) {
+        $query_arg[ 'meta_query'] = $this->build_metaquery($this->token_status);
+      }
 
-        switch ($status) {
-          case 'active':
-              $meta_query[] = array(
-                  'relation' => 'AND',
-                   array(
-                     'key' => 'zbyva_hlasu',
-                     'value' => 0 ,
-                     'compare' => '>',
-                     'type' => 'NUMERIC'
-                   ),
-                   array(
-                    'key'     => 'platnost_do',
-                    'value'   => date("Y-m-d H:i:s") ,
-                    'compare' => '>',
-                    'type' => 'DATETIME'
-                  ),
-                );
-            break;
-          case 'expired' :
-              $meta_query[] = array(
-                  'relation' => 'AND',
-                   array(
-                     'key' => 'zbyva_hlasu',
-                     'value' => 0 ,
-                     'compare' => '>',
-                     'type' => 'NUMERIC'
-                   ),
-                   array(
-                    'key'     => 'platnost_do',
-                    'value'   => date("Y-m-d H:i:s") ,
-                    'compare' => '<=',
-                    'type' => 'DATETIME'
-                  ),
-                );
-            break;
-          case 'voted' :
-              $meta_query[] = array(
-                  'relation' => 'AND',
-                   array(
-                     'key' => 'zbyva_hlasu',
-                     'value' => 0 ,
-                     'compare' => '0',
-                     'type' => 'NUMERIC'
-                   ),
-                );
-            break;
-          case 'all' :
-          default:
-            $meta_query = array(array());
-            break;
-        }
-        $query_arg = array(
-                'post_type' => PRVT_POST_TYPE,
-                'post_status' => array('publish'),
-                'posts_per_page' => -1,
-                'post_parent' => $parent_id,
-                'meta_query'  => $meta_query,
-              );
-
-        $post_list = new WP_Query( $query_arg );
-
-    // The Loop
-    $tokens = array();
-    if ( $post_list->have_posts() ) :
-        while ( $post_list->have_posts() ) :
-          $post_list->the_post();
-          array_push( $tokens, array('ID' => get_the_ID(), 'token' => get_the_title()));
-        endwhile;
-    endif;
-
-    // Reset Post Data
-    wp_reset_postdata();
-    return $tokens;
+      $token_list = get_posts( $query_arg );
+      $result = true;
+      if ( count($token_list) > 0) {
+          foreach ($token_list as $token_post ) {
+            $single_result = $this->delete_token_by_postid( $token_post->ID );
+            if ( ! $single_result ) {
+              $result = false;
+            }
+          }
+      }
+      if ($result) {
+        $this->set_result_ok();
+        return true;
+      } else {
+        $this->set_result_error( 'error_delete');
+        return false;
+      }
     }
+
     /**
     * Returns array with results.
     *
-    * @since 0.1.0
+    * @since 0.2.0
     *
     * @return array Array of result info.
     */
     public function get_result()
     {
       return $this->result;
+    }
+
+    /**
+    * Returns array with meta query.
+    *
+    * @since 0.2.0
+    *
+    * @param string $token_status Status from form.
+    *
+    * @return array Array of meta query parameters.
+    */
+    private function build_metaquery( $token_status)
+    {
+      switch ($token_status) {
+        case 'active':
+          $curr_time = current_time('timestamp', false);
+          $meta_query_args = array(
+            'relation' => 'AND',
+            array(
+              'key'     => 'zbyva_hlasu',
+              'value'   => 0,
+              'compare' => '>'
+            ),
+            array(
+              'key'     => 'platnost_od',
+              'value'   => $curr_time,
+              'compare' => '<'
+            ),
+            array(
+              'key'     => 'platnost_do',
+              'value'   => $curr_time,
+              'compare' => '>'
+            ),
+          );
+          break;
+
+        case 'expired':
+          $curr_time = current_time('timestamp', false);
+          $meta_query_args = array(
+            'relation' => 'AND',
+            array(
+              'key'     => 'zbyva_hlasu',
+              'value'   => 0,
+              'compare' => '>'
+            ),
+            array(
+              'key'     => 'platnost_do',
+              'value'   => $curr_time,
+              'compare' => '<='
+            ),
+          );
+          break;
+
+        case 'used':
+            $meta_query_args = array(
+              'relation' => 'AND',
+              array(
+                'key'     => 'zbyva_hlasu',
+                'value'   => 0,
+                'compare' => '='
+              ),
+            );
+          break;
+
+        default:
+          $meta_query_args = array();
+          break;
+      }
+      return $meta_query_args;
     }
 }

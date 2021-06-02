@@ -172,6 +172,19 @@ function prvt_saveVotes($result = "", $data = "", $form_id = "", $spec_notif = "
   }
 }
 
+/**
+ * Deletes tokens and votes.
+ *
+ * Is called by filter. Deletes either single token or tokens of a project.
+ *
+ * @since 0.2.0
+ *
+ * @param bool $result value set by do_filter.
+ * @param array $data Associative array with all input values from a form.
+ * @param string $form_id ID of the form that calls the function. Not used.
+ * @param object $spec_notification Used for returning specific error message on case of false result.
+ * @return bool result.
+ */
 function prvt_deleteToken($result = "", $data = "", $form_id = "", $spec_notif = "" )
 {
   $token_to_delete = new PrVt_DeleteTokens( $data);
@@ -184,5 +197,3 @@ function prvt_deleteToken($result = "", $data = "", $form_id = "", $spec_notif =
     return false;
   }
 }
-
-// PrVt_TokenDelete( true, array( 'projekt' => 543,), 545, "" );

@@ -38,7 +38,7 @@ function prvt_activation_create_tables( )
             `token_id` INT NOT NULL,
             `vote_plus` SMALLINT,
             `vote_minus` SMALLINT,
-            `created_time` DATETIME NOT NULL,
+            `cct_created` DATETIME NOT NULL DEFAULT current_timestamp(),
             PRIMARY KEY (`id`),
             UNIQUE INDEX `id_UNIQUE` (`id` ASC),
             INDEX `project` (`project_id` ASC, `proposal_id`),
