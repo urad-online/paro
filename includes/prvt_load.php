@@ -45,4 +45,6 @@ function prvt_on_init()
     add_filter('jet-engine-booking/filter/checkToken',  "prvt_checkToken", 10, 4);
     add_filter('jet-engine-booking/filter/saveVotes',   "prvt_saveVotes", 10, 4);
     add_filter('jet-engine-booking/filter/deleteToken', "prvt_deleteToken", 10, 4);
+    add_filter('jet-engine-booking/filter/generateTestVotes', "prvt_generateTestVotes", 10, 4);
+    // prvt_generateTestTokens();
 }

@@ -102,14 +102,20 @@ function prvt_getTokens($result = "", $data = "", $form_id = "", $spec_notif = "
  */
 function prvt_checkToken($result = "", $data = "", $form_id = "", $spec_notif = "" )
 {
+  $t1 = microtime(true);
+  $mt1 = DateTime::createFromFormat('U.u', $t1);
 
   $token = new PrVt_SingleToken( $data);
   $result = $token->checkToken();
 
+  $duration = (microtime(true) - $t1)*1000;
+  error_log( "Validace tokenu : ". $mt1->format("Y-m-d h:i:s.u")." - duration : ". $duration);
+
+
   // because Pavel wants to redirect always regardless the validation result
-    $new_url = prvt_set_url_to_voting_page( $token->get_result() );
-  wp_redirect( $new_url ) ;
-  exit;
+  // $new_url = prvt_set_url_to_voting_page( $token->get_result() );
+  // wp_redirect( $new_url ) ;
+  // exit;
 
   // the rest is skipped
   if ($result) {
@@ -193,6 +199,19 @@ function prvt_deleteToken($result = "", $data = "", $form_id = "", $spec_notif =
     return true;
   } else {
     $result = $token_to_delete->get_result();
+    $spec_notif->set_specific_status( $result['message']);
+    return false;
+  }
+}
+function prvt_generateTestVotes($result = "", $data = "", $form_id = "", $spec_notif = "" )
+{
+
+  $token_to_generate = new PrVt_GenerateVotes( $data);
+  $result = $token_to_generate->generateVotes();
+  if ($result) {
+    return true;
+  } else {
+    $result = $token_to_generate->get_result();
     $spec_notif->set_specific_status( $result['message']);
     return false;
   }
