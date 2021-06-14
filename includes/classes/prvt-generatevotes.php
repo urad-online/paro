@@ -2,26 +2,71 @@
 /**
  * Saves votes to the table.
  *
- * Genereat random votes for perfomance testing.
+ * Genereat random votes for performance testing.
  *
  * @package paro
  * @since 0.2.1
  */
 class PrVt_GenerateVotes extends PrVt_FormParams
 {
+    /**
+    * Id of project the random votes will be generated.
+    * @since 0.2.1
+    * @var array $project_id
+    */
     protected $project_id  = "";
+    /**
+    * Default number of created Plus votes.
+    * @since 0.2.1
+    * @var array $nr_plus
+    */
     protected $nr_plus  = 3;
+    /**
+    * Default number of created Minus votes.
+    * @since 0.2.1
+    * @var array $nr_minus
+    */
     protected $nr_minus  = 3;
+    /**
+    * Default number of used tokens.
+    * @since 0.2.1
+    * @var array $nr_tokens
+    */
     protected $nr_tokens = 1;
+    /**
+    * Array to store selected tokens for votes generation.
+    * @since 0.2.1
+    * @var array $token_list
+    */
     protected $token_list = array();
+    /**
+    * Array to store all proposal assigned to the project. Each random vote picks a proposal from this list.
+    * @since 0.2.1
+    * @var array $proposals
+    */
     protected $proposals = array();
+    /**
+    * Array to that maps form field to required input parameter.
+    * @since 0.2.1
+    * @var array $input_forms_generate
+    */
     protected $input_forms_generate = array(
       'project_id' => 'projectId',
       'nr_tokens' => 'countToken',
       'nr_plus'   => 'countPlus',
       'nr_minus'  => 'countMinus',
     );
+    /**
+    * Maping proposals' post_type.
+    * @since 0.2.1
+    * @var array $input_forms_generate
+    */
     protected $proposals_post_type = "pr-navrhy";
+    /**
+    * Meta_key for relation between post_types pr-projekt and pr-navrhy.
+    * @since 0.2.1
+    * @var array $input_forms_generate
+    */
     protected $proposals_meta_key  = "relation_d15c7aa91423515c18fe4c60455a6022";
     protected $proposals_count     = 0;
 
@@ -34,6 +79,17 @@ class PrVt_GenerateVotes extends PrVt_FormParams
         $this->messages["nothingCreated"] = __("Nebyl uložen žádný hlas", PRVT_DOMAIN);
     }
 
+    /**
+    * Main class function for votes generation.
+    *
+    * It reads required number of active tokens and all proposals assigned to the project.
+    * Generates votes for all selected tokens in a loop.
+    *
+    * @param array $params Array of input fields with values from form
+    * @since 0.2.1
+    *
+    * @return bool True if all votes created or false when there was at least one error in vote generation.
+    */
     public function generateVotes()
     {
         $result = false;
@@ -42,6 +98,13 @@ class PrVt_GenerateVotes extends PrVt_FormParams
         }
         return $result;
     }
+
+    /**
+    * Set class properties.
+    *
+    * @param array $params Array of input fields with values from form
+    * @since 0.2.1
+    */
     protected function set_params()
     {
       $par_value = $this->getValueFromParams( $this->input_forms_generate['project_id']);
@@ -71,7 +134,7 @@ class PrVt_GenerateVotes extends PrVt_FormParams
     *
     * @since 0.2.1
     *
-    * @return bool|mixed If token is active returns array otherwise false.
+    * @return bool True when at least one token is selected for votes' generation.
     */
     protected function getTokens( )
     {
@@ -123,11 +186,12 @@ class PrVt_GenerateVotes extends PrVt_FormParams
 
     }
     /**
-    * Reads active tokens for a project_id.
+    * Reads proposal of a project_id.
     *
     * @since 0.2.1
     *
-    * @return bool|mixed If token is active returns array otherwise false.
+    * @return bool True when enough proposals is selected. The number must be higher
+    * then "Plus votes + minus votes"
     */
     protected function getProposals( )
     {
@@ -166,9 +230,9 @@ class PrVt_GenerateVotes extends PrVt_FormParams
     }
 
     /**
-    * Generates and saves votes.
+    * Generates and saves votes in loop.
     *
-    * Calls method for token validation if this is successfull saves votes.
+    * Calls class for saving votes of one token.
     *
     * @since 0.2.1
     *
@@ -214,6 +278,16 @@ class PrVt_GenerateVotes extends PrVt_FormParams
 
     }
 
+    /**
+    * Call function for a random selection a proposal and adds it to the output array.
+    *
+    * @since 0.2.1
+    *
+    * @param int $count_to_generate Number of votes to be generated.
+    * @param array $already_picked Array already selected items. Used to ensure an uniqueness.
+    *
+    * @return array List of ramdomely selected proposals IDs.
+    */
     private function generate_votes( $count_to_generate = 1,$already_picked = array())
     {
       $votes = array();
@@ -227,6 +301,18 @@ class PrVt_GenerateVotes extends PrVt_FormParams
       }
       return $votes;
     }
+
+    /**
+    * Randomly selects an item from array.
+    *
+    * @since 0.2.1
+    *
+    * Compares the item with a list of selected proposals. If the item is already used than
+    * repeates the random selection until a not used item is choosen.
+    *
+    * @param array $already_picked Array already selected items. Used to ensure an uniqueness.
+    * @return array List of ramdomely selected proposals IDs.
+    */
     protected function random_prop_id( $already_picked = array())
     {
       $new = $this->proposals[ array_rand( $this->proposals, 1) ];

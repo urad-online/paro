@@ -37,7 +37,14 @@ function prvt_autoloader( $class_name ) {
         require( $file );
     }
 }
-
+/**
+ * Adds filters to be called as callback functions from jetEngine forms.
+ *
+ * Is called on wp init.
+ *
+ * @since 0.1.0
+ *
+ */
 function prvt_on_init()
 {
     add_filter('jet-engine-booking/filter/generateTokens', "prvt_generateTokens", 10, 4);

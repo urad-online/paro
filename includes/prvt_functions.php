@@ -203,6 +203,19 @@ function prvt_deleteToken($result = "", $data = "", $form_id = "", $spec_notif =
     return false;
   }
 }
+/**
+ * Generates random votes fro testng purpose.
+ *
+ * Is called by filter. Selects set of tokens and writes random votes.
+ *
+ * @since 0.2.1
+ *
+ * @param bool $result value set by do_filter.
+ * @param array $data Associative array with all input values from a form.
+ * @param string $form_id ID of the form that calls the function. Not used.
+ * @param object $spec_notification Used for returning specific error message on case of false result.
+ * @return bool result.
+ */
 function prvt_generateTestVotes($result = "", $data = "", $form_id = "", $spec_notif = "" )
 {
 

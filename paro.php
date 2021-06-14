@@ -4,7 +4,7 @@
 * Plugin URI: https://urad.online
 * Description: Participativní rozpočet - hlasovaci tokeny
 * Author: Miloslav Stastny
-* Version: 0.2.0
+* Version: 0.2.1
 * Author URI: https://urad.online
 * Text Domain: prvt-token
 * Domain Path: /languages

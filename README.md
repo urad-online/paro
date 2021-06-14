@@ -46,8 +46,25 @@ D. Setting for votes' deleting
   2. Use value "deleteToken" in the callback function definition in the form.
       see   add_filter('jet-engine-booking/filter/deleteToken', "prvt_deleteToken", 10, 4);
 
+E. Setting for generating test votes
+  1. Create a form with Inputs:
+    1. a)
+      1. Project ID  - name of the input : "projectId"
+      2. Number of used tokens - name of the input : "countToken"
+      3. Number of created Plus votes - name of the input : "countPlus"
+      4. Number of created Minus votes - name of the input : "countMinus"
+      Name if inputs can be changes in class "PrVt_GenerateVotes" property "$input_forms_generate".
+  2. Use value "generateTestVotes" in the callback function definition in the form.
+      see   add_filter('jet-engine-booking/filter/generateTestVotes', "prvt_generateTestVotes", 10, 4);
+  3. Set correct value of meta_key attribut used for relation between pr-projekt and pr-navrhy.
+      See class "PrVt_GenerateVotes" property "$proposals_meta_key"
+
 
 # ChangeLog
+## 0.2.1
+* Added function for generation of random votes;
+* Small fixes.
+
 ## 0.2.0
 * Added deleting of tokens;
 * Name of DB table changed to wp_jet_cct_pr_hlasy. Removed table column "created_time";
