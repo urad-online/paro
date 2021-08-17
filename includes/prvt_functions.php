@@ -169,6 +169,7 @@ function prvt_saveVotes($result = "", $data = "", $form_id = "", $spec_notif = "
 {
   $token = new PrVt_SingleTokenVotes( $data);
   $result = $token->save_votes();
+  // $result = false;
   if ($result) {
     return true;
   } else {

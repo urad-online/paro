@@ -34,8 +34,8 @@ define( 'INPUTS_FORM_VOTE', array(
   'project_id'   => 'projekt',
   'votes_plus'   => 'plusa',
   'votes_minus'  => 'minusa',
-  'voting_start' => 'hlasovani_konec',
-  'voting_end'   => 'hlasovani_zacatek',
+  'voting_start' => 'hlasovani_zacatek',
+  // 'voting_end'   => 'hlasovani_konec',
 ));
 define( 'INPUTS_FORM_DELETE', array(
   'token'        => 'token',

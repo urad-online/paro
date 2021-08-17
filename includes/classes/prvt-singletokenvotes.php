@@ -40,7 +40,8 @@ class PrVt_SingleTokenVotes extends PrVt_SingleToken
       $this->votes_minus =  explode ( $this->values_delimiter , $this->getValueFromParams( INPUTS_FORM_VOTE['votes_minus']));
 
       $this->voting_start = $this->getValueFromParams( INPUTS_FORM_VOTE['voting_start']);
-      $this->voting_end   = $this->getValueFromParams( INPUTS_FORM_VOTE['voting_end']);
+      // $this->voting_end   = $this->getValueFromParams( INPUTS_FORM_VOTE['voting_end']);
+      $this->voting_end   = current_time( 'timestamp', 0 );
     }
 
     /**
