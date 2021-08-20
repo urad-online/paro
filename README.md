@@ -8,6 +8,7 @@ A. Setting for tokens' generation
       3. ID of project assoc. with tokens - name of the input : "prProjectId"
       4. Hours of token expiration        - name of the input : "prExpirationHrs"
       5. Number of votes one token has    - name of the input : "prTokenVotes"
+      6. Token group (class)              - name of the input : "prTokenGroup"
       Name if inputs can be changes in const INPUTS_FORM_GENERATE in header of paro.php file.
   2. Use value "generateTokens" in the callback function definition in the form.
       see add_filter('jet-engine-booking/filter/generateTokens', "prvt_generateTokens", 10, 4);
@@ -29,8 +30,7 @@ C. Setting for votes' saving
       2. Project ID   - name of the input : 'projekt'
       3. List of plus votes  - name of the input : 'plusa',
       4. List of minus votes - name of the input : 'minusa'
-      5. Timestamp when voting started - name of the input : 'hlasovani_konec'
-      6. Timestamp when voting ended   - name of the input : 'hlasovani_zacatek'
+      5. Timestamp when voting started - name of the input : 'hlasovani_zacatek'
       Name if inputs can be changes in const INPUTS_FORM_VOTE in header of paro.php file.
   2. Use value "saveVotes" in the callback function definition in the form.
       see   add_filter('jet-engine-booking/filter/saveVotes', "prvt_saveVotes", 10, 4);
@@ -40,8 +40,9 @@ D. Setting for votes' deleting
     1. a)
       1. Token value  - name of the input : "token"
     1. b)
-      1. Project ID  - name of the input : 'projekt'
-      2. Token status - name of the input : 'status', ( supported values are all|active|expired|used. Can be empty)
+      1. Project ID        - name of the input : 'projekt'
+      2. Token status      - name of the input : 'status', ( supported values are all|active|expired|used. Can be empty)
+      3. Token group       - name of the input : "prTokenGroup"
       Name if inputs can be changes in const INPUTS_FORM_DELETE in header of paro.php file.
   2. Use value "deleteToken" in the callback function definition in the form.
       see   add_filter('jet-engine-booking/filter/deleteToken', "prvt_deleteToken", 10, 4);
@@ -61,6 +62,11 @@ E. Setting for generating test votes
 
 
 # ChangeLog
+## 0.2.2
+* Added attribute token_group to form for generation and deleting token.
+* timestamp end of voting generation when a vote is saved to DB. Not read from form.
+* Small fixes.
+
 ## 0.2.1
 * Added function for generation of random votes;
 * Small fixes.

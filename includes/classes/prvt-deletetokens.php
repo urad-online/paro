@@ -22,6 +22,13 @@ class PrVt_DeleteTokens extends PrVt_FormParams
     */
     private $project_id = 0;
 
+    /**
+    * Defaut value of token group.
+    * @since 0.2.2
+    * @var string $default_group
+    */
+    const TOKEN_GROUP =  "all";
+
     public function __construct( $params = null)
     {
         parent::__construct( $params);
@@ -67,6 +74,13 @@ class PrVt_DeleteTokens extends PrVt_FormParams
       if ( !empty($token) ) {
         $this->token_value = explode ( $this->values_delimiter , $token);
         $this->single_delete = true;
+      }
+
+      $token_group = $this->getValueFromParams( INPUTS_FORM_DELETE['token_group']);
+      if (! empty($token_group) ) {
+        $this->token_group = $token_group;
+      } else {
+        $this->token_group = self::TOKEN_GROUP;
       }
 
     }
@@ -244,12 +258,13 @@ class PrVt_DeleteTokens extends PrVt_FormParams
               'post_parent' => $this->project_id,
               'posts_per_page' => -1,
             );
-      if ( $this->token_status !== "all" ) {
+      if ( $this->token_status !== "all"  || $this->token_group !== self::TOKEN_GROUP) {
         $query_arg[ 'meta_query'] = $this->build_metaquery($this->token_status);
       }
 
       $token_list = get_posts( $query_arg );
       $result = true;
+      
       if ( count($token_list) > 0) {
           foreach ($token_list as $token_post ) {
             $single_result = $this->delete_token_by_postid( $token_post->ID );
@@ -345,6 +360,22 @@ class PrVt_DeleteTokens extends PrVt_FormParams
           $meta_query_args = array();
           break;
       }
+
+      if ( $this->token_group != "all") {
+        if (count($meta_query_args) == 0) {
+          $meta_query_args = array(
+              'relation' => 'AND',
+            );
+        }
+        array_push($meta_query_args,
+            array(
+              'key' => 'token_group',
+              'value' => $this->token_group ,
+              'compare' => '=',
+              'type' => 'CHAR'
+            ));
+      }
+
       return $meta_query_args;
     }
 }

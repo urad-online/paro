@@ -25,6 +25,7 @@ define( 'INPUTS_FORM_GENERATE', array(
   'project_id'   => 'prProjectId',
   'exp_hrs'      => 'prExpirationHrs',
   'votes_count'  => 'prTokenVotes',
+  'token_group'  => 'prTokenGroup',
 ));
 define( 'INPUTS_FORM_CHECKTOKEN', array(
   'token'        => 'token',
@@ -41,6 +42,7 @@ define( 'INPUTS_FORM_DELETE', array(
   'token'        => 'token',
   'project_id'   => 'projekt',
   'token_status' => 'status',
+  'token_group'  => 'prTokenGroup',
 ));
 
 register_activation_hook( __FILE__, 'prvt_activation' );

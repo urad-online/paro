@@ -42,6 +42,13 @@ class PrVt_TokenPersist
     private $post_data =  array();
 
     /**
+    * Defaut value of token group.
+    * @since 0.2.2
+    * @var string $default_group
+    */
+    const DEFAULT_GROUP =  "zakladni";
+
+    /**
      * Set class properties.
      *
      * @param array $params Array of input fields with values from form
@@ -92,6 +99,24 @@ class PrVt_TokenPersist
       }
     }
 
+
+    /**
+    * Reads token group value from an array of parametrs.
+    *
+    * Reads values from array set in constructor. If expected value is not set, the default value is used.
+    *
+    * @since 0.2.2
+    */
+    private function set_params_group()
+    {
+      $token_group = $this->getValueFromParams( INPUTS_FORM_GENERATE['token_group']);
+      if (! empty($token_group) ) {
+        $this->token_group = $token_group;
+      } else {
+        $this->token_group = self::DEFAULT_GROUP;
+      }
+    }
+
     /**
     * Reads one value from array.
     *
@@ -139,10 +164,11 @@ class PrVt_TokenPersist
     */
     public function insert_token( $token )
     {
-      $this->result = array(
-        'result'  => "ok",
-        'message' => $this->messages[ "ok"],
-      );
+        $this->result = array(
+          'result'  => "ok",
+          'message' => $this->messages[ "ok"],
+        );
+
         if (! $this->parent_id > 0) {
           $this->result = array(
             'result'  => "error",
@@ -159,6 +185,8 @@ class PrVt_TokenPersist
           return false;
         }
 
+        $this->set_params_group();
+
         $issue_time      =  current_time( 'timestamp', 0 );
         $expiration_time = $issue_time + 60*60*intval($this->expiration_hrs);
 
@@ -167,6 +195,7 @@ class PrVt_TokenPersist
         $post_data['post_name']  = $token;
         $post_data['meta_input'] = array(
           'pr-projekt'  => $this->parent_id,
+          'token_group' => $this->token_group,
           'token'       => $token,
           'platnost_od' => strval( $issue_time),
           'platnost_do' => strval( $expiration_time),
@@ -215,7 +244,7 @@ class PrVt_TokenPersist
     * @param datetime $from_date
     * @return array  List of tokens - post ID + token value.
     */
-    public function get_project_tokens( $parent_id = 0, $status = "all", $from_date = "" )
+    public function get_project_tokens( $parent_id = 0, $status = "all", $from_date = "", $group = "all" )
     {
         $status = strtolower( $status);
 
@@ -270,6 +299,22 @@ class PrVt_TokenPersist
             $meta_query = array(array());
             break;
         }
+
+        if ( $group != "all") {
+          if (count($meta_query) == 0) {
+            $meta_query[] = array(
+                'relation' => 'AND',
+              );
+          }
+          array_push($meta_query[0],
+              array(
+                'key' => 'token_group',
+                'value' => $group ,
+                'compare' => '=',
+                'type' => 'CHAR'
+              ));
+        }
+
         $query_arg = array(
                 'post_type' => PRVT_POST_TYPE,
                 'post_status' => array('publish'),
